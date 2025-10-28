@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Test withdrawal request",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "phoneNumber": "+79991234567",
+        "bankName": "Сбербанк",
+        "amount": 500,
+        "userBalance": 1000
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

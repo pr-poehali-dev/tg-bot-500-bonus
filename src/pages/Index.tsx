@@ -24,7 +24,7 @@ const Index = () => {
     });
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
     if (!phoneNumber || !bankName || !withdrawAmount) {
       toast({
         title: "⚠️ Заполните все поля",
@@ -43,14 +43,42 @@ const Index = () => {
       return;
     }
 
-    toast({
-      title: "✅ Заявка отправлена!",
-      description: "Ваша заявка на вывод средств принята в обработку",
-    });
+    try {
+      const response = await fetch("https://functions.poehali.dev/f2a98b1e-d23c-4da0-bb0f-6eb7a76748b8", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phoneNumber,
+          bankName,
+          amount: Number(withdrawAmount),
+          userBalance: balance,
+          timestamp: new Date().toLocaleString("ru-RU"),
+        }),
+      });
 
-    setPhoneNumber("");
-    setBankName("");
-    setWithdrawAmount("");
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast({
+          title: "✅ Заявка отправлена!",
+          description: "Ваша заявка на вывод средств принята в обработку",
+        });
+
+        setPhoneNumber("");
+        setBankName("");
+        setWithdrawAmount("");
+      } else {
+        throw new Error(data.error || "Ошибка отправки заявки");
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Ошибка",
+        description: error instanceof Error ? error.message : "Не удалось отправить заявку",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
